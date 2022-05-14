@@ -70,15 +70,6 @@ const osThreadAttr_t readCANTask_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
 };
 
-/* USER CODE END Variables */
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
-
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
@@ -86,8 +77,6 @@ void kernelLEDTask (void *argument);
 void readCANTask(void *argument);
 
 /* USER CODE END FunctionPrototypes */
-
-void StartDefaultTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -117,13 +106,9 @@ void MX_FREERTOS_Init(void) {
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
-  /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
-
   /* USER CODE BEGIN RTOS_THREADS */
 
-  // kernelLEDTaskHandle = osThreadNew(kernelLEDTask, NULL, &kernelLEDTask_attributes);
+  kernelLEDTaskHandle = osThreadNew(kernelLEDTask, NULL, &kernelLEDTask_attributes);
   readCANTaskHandle = osThreadNew(readCANTask, NULL, &readCANTask_attributes);
 
   /* USER CODE END RTOS_THREADS */
@@ -132,24 +117,6 @@ void MX_FREERTOS_Init(void) {
   /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
 
-}
-
-/* USER CODE BEGIN Header_StartDefaultTask */
-/**
-  * @brief  Function implementing the defaultTask thread.
-  * @param  argument: Not used
-  * @retval None
-  */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
-{
-  /* USER CODE BEGIN StartDefaultTask */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END StartDefaultTask */
 }
 
 /* Private application code --------------------------------------------------*/
@@ -162,7 +129,7 @@ __NO_RETURN void kernelLEDTask (void *argument) {
     kernel_status = osKernelGetState();
 
     if (kernel_status == osKernelRunning) {
-      HAL_GPIO_TogglePin(KERNEL_LED_GPIO_Port, KERNEL_LED_Pin);
+      //HAL_GPIO_TogglePin(KERNEL_LED_GPIO_Port, KERNEL_LED_Pin);
     }
 
     osDelay(KERNEL_LED_DELAY);
@@ -173,8 +140,6 @@ __NO_RETURN void readCANTask(void *argument) {
   static HAL_StatusTypeDef rx_status;
 
     while (1) {
-      // wait for CAN RX ISR to set thread flags
-      osThreadFlagsWait(CAN_READY, osFlagsWaitAll, osWaitForever);
 
       if (HAL_CAN_GetRxFifoFillLevel(&hcan, CAN_RX_FIFO0) != 0) {
         // there are multiple CAN IDs being passed through the filter, pull out the current message

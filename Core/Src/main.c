@@ -106,6 +106,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // <----- CAN set-up ------>
+  CanFilterSetup();
   can_start = HAL_CAN_Start(&hcan);
   assert_param(can_start == HAL_OK);
 
