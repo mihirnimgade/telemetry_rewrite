@@ -47,7 +47,6 @@ void MX_CAN_Init(void);
 /* USER CODE BEGIN Prototypes */
 
 extern osThreadId_t readCANTaskHandle;
-extern CAN_RxHeaderTypeDef can_rx_header;
 
 void CanFilterSetup(void);
 

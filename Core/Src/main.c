@@ -26,6 +26,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "can.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,6 +47,16 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
+CAN_FilterTypeDef CAN_filter0;
+CAN_FilterTypeDef CAN_filter1;
+
+CAN_RxHeaderTypeDef can_rx_header;
+
+HAL_StatusTypeDef can_start;
+
+uint8_t current_can_data[8];
+HAL_StatusTypeDef rx_status;
 
 /* USER CODE END PV */
 
@@ -67,6 +79,7 @@ void MX_FREERTOS_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 
   /* USER CODE END 1 */
 
@@ -92,7 +105,13 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  // kernelTaskHandle = osThreadNew();
+  // <----- CAN set-up ------>
+  can_start = HAL_CAN_Start(&hcan);
+  assert_param(can_start == HAL_OK);
+
+  // HAL_StatusTypeDef can_notification_status = HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
+  // assert_param(can_notification_status == HAL_OK);
+
 
   /* USER CODE END 2 */
 
