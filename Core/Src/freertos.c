@@ -145,23 +145,10 @@ __NO_RETURN void readCANTask(void *argument) {
         // there are multiple CAN IDs being passed through the filter, pull out the current message
         rx_status = HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0, &can_rx_header, current_can_data);
         HAL_GPIO_TogglePin(KERNEL_LED_GPIO_Port, KERNEL_LED_Pin);
+
+        // XBee transmit the can header and data
+        XBeeTransmitCan(&can_rx_header, current_can_data);
       }
-        //
-        // // motor ID
-        // if (can_rx_header.StdId == 0x50B) {
-        //     can_id = MOTOR_ID;
-        // }
-        // // battery SOC ID
-        // else if (can_rx_header.StdId == 0x626) {
-        //     can_id = BATTERY_ID;
-        // } else {
-        //     // Major error. A CAN ID was received even though the filter only accepts 0x50B and 0x626
-        //     can_id = INVALID;
-        // }
-        //
-        // osEventFlagsSet(canIdEventFlagsHandle, can_id);
-        // HAL_StatusTypeDef status = HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
-        // assert_param(status == HAL_OK);
 
         osDelay(100);
     }
