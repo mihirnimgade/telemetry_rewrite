@@ -27,7 +27,6 @@
 /* USER CODE BEGIN Includes */
 
 #include "can.h"
-#include "XBee.h"
 
 /* USER CODE END Includes */
 
