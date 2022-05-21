@@ -50,6 +50,11 @@ extern osThreadId_t readCANTaskHandle;
 
 void CanFilterSetup(void);
 
+typedef struct {
+  CAN_RxHeaderTypeDef header;
+  uint8_t data[8];
+} CAN_msg_t;
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
