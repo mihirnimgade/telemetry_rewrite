@@ -258,7 +258,6 @@ __NO_RETURN void transmitMessageTask(void *argument) {
       HAL_UART_Transmit(&huart3, &c, 1, 1000);
     }
 
-
     // CAN ID: 4 ASCII characters
     uint8_t id_h = 0xFFUL & (can_message.header.StdId >> 8);
     uint8_t id_l = 0xFFUL & (can_message.header.StdId);
@@ -279,7 +278,6 @@ __NO_RETURN void transmitMessageTask(void *argument) {
     // NEW LINE: 1 ASCII character
     uint8_t newline = 0xA;
     HAL_UART_Transmit(&huart3, &newline, 1, 1000);
-
   }
 }
 
