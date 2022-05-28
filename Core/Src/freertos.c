@@ -203,23 +203,8 @@ __NO_RETURN void readCANTask(void *argument) {
         current_can_message.data[i] = current_can_data[i];
       }
 
-      // XBee transmit the can header and data
-      // XBeeTransmitCan(&can_rx_header, &current_can_data[0]);
-      // THIS WORKS
-      // uint8_t arr[3] = {0x65, 0x65, 0x65};
-      // HAL_UART_Transmit_IT(&huart3, &arr[0], 3);
-
-      // transmit ID first
-
       // priority=0, timeout=0
       osMessageQueuePut(canMessageQueueHandle, &current_can_message, 0U, 0U);
-
-      // CAN ID: 2 bytes
-      // can_stream[0] = 0xFFUL & ( can_rx_header.StdId >> 8);
-      // can_stream[1] = 0xFFUL & ( can_rx_header.StdId);
-      //
-      // HAL_UART_Transmit_IT(&huart3, can_stream, 30);    }
-
     }
     osDelay(100);
   }
@@ -238,22 +223,7 @@ __NO_RETURN void transmitMessageTask(void *argument) {
         osThreadYield();
     }
 
-    // start transmitting CAN message over UART
-    // CAN ID: 2 bytes
-    // can_stream[0] = 0xFFUL & ( can_message.header.StdId >> 8);
-    // can_stream[1] = 0xFFUL & ( can_message.header.StdId);
-    //
-    // uint8_t c_H = "0123456789ABCDEF"[(c >> 4) & 0xFUL];
-    // uint8_t c_L = "0123456789ABCDEF"[ c & 0xFUL];
-    //
-    // // CAN DATA: 8 bytes
-    // for (uint8_t i=0; i<8; i++) {
-    //   can_stream[2+i] = 0xFF & (can_message.data[i]);
-    // }
-
     // TIMESTAMP: 8 ASCII characters
-    
-    // TODO: finish writing this
     for (uint8_t i=0; i<8; i++) {
       // send 'D' as placeholder
       uint8_t c = 0x44;
