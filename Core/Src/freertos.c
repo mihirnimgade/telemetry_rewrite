@@ -280,6 +280,10 @@ __NO_RETURN void transmitMessageTask(void *argument) {
     // NEW LINE: 1 ASCII character
     uint8_t newline = 0xA;
     HAL_UART_Transmit(&huart3, &newline, 1, 1000);
+
+    // CARRIAGE RETURN: 1 ASCII character
+    uint8_t carriage = 0xD;
+    HAL_UART_Transmit(&huart3, &carriage, 1, 1000);
   }
 }
 
