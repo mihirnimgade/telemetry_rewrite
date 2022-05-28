@@ -47,7 +47,7 @@ void CanFilterSetup(void)
     CAN_filter0.FilterActivation = CAN_FILTER_ENABLE;
 
     // Remaining IDs filtered with list mode
-    CAN_filter1.FilterIdHigh = (uint16_t) (0x401 << 5);
+    CAN_filter1.FilterIdHigh = (uint16_t) (0x502 << 5);
     CAN_filter1.FilterMaskIdHigh = (uint16_t) (0x401 << 5);
 
     CAN_filter1.FilterIdLow = (uint16_t) (0x401 << 5);
@@ -81,6 +81,7 @@ void MX_CAN_Init(void)
 
   /* USER CODE END CAN_Init 1 */
   hcan.Instance = CAN1;
+  // hcan.Init.Prescaler = 4;
   hcan.Init.Prescaler = 16;
   hcan.Init.Mode = CAN_MODE_NORMAL;
   hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
