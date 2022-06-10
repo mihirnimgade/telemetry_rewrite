@@ -14,6 +14,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: install arm-none-eabi-*
-      run: sudo apt-get update && sudo apt-get install build-essential
+      run: sudo apt-get update && sudo apt-get install gcc-arm-none-eabi
     - name: make debug
       run: cd Debug/ && make -j8 all
