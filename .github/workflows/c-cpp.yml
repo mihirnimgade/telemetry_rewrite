@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: Embedded Make CI
 
 on:
   push:
@@ -13,16 +13,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: install arm-none-eabi-*
+    - name: Install toolchain (arm-none-eabi)
       run: sudo apt-get update && sudo apt-get install gcc-arm-none-eabi
-    - name: make debug
+    - name: Build debug target
       run: cd Debug/ && make -j8 all
       
-    - name: collect artifacts
-      run: mkdir build && cp Debug/*.elf build
+    - name: Collect build artifacts
+      run: mkdir build && cp Debug/*.* build
       
-    - name: upload artifacts
-      uses: actions/upload-artifact@v2
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
       with:
-        name: debug build
+        name: build
         path: build
