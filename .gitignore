@@ -6,11 +6,13 @@
 *.ko
 *.obj
 *.elf
+*.bin
 
 # Linker output
 *.ilk
 *.map
 *.exp
+*.list
 
 # Precompiled Headers
 *.gch
@@ -58,8 +60,6 @@ dkms.conf
 RemoteSystemsTempFiles*
 
 # Compiled binaries
-**/Debug/
-**/Release/
 Doxyfile-firmwarev3
 
 .cache/*
