@@ -19,7 +19,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
-// #include "stm32f1xx_hal_gpio.h"
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
@@ -223,7 +222,6 @@ __NO_RETURN void readCANTask(void *argument) {
 }
 
 __NO_RETURN void transmitMessageTask(void *argument) {
-  static uint8_t can_stream[30] = {0};
   static CAN_msg_t can_message;
   osStatus_t queue_status;
 
@@ -235,11 +233,12 @@ __NO_RETURN void transmitMessageTask(void *argument) {
         osThreadYield();
     }
 
+    uint8_t c[1] = "D";
+
     // TIMESTAMP: 8 ASCII characters
     for (uint8_t i=0; i<8; i++) {
       // send 'D' as placeholder
-      uint8_t c = 0x44;
-      HAL_UART_Transmit(&huart3, &c, 1, 1000);
+      HAL_UART_Transmit(&huart3, c, sizeof(c), 1000);
     }
 
     // CAN ID: 4 ASCII characters
@@ -260,29 +259,24 @@ __NO_RETURN void transmitMessageTask(void *argument) {
     HAL_UART_Transmit(&huart3, &length, 1, 1000);
 
     // NEW LINE: 1 ASCII character
-    uint8_t newline = 0xA;
-    HAL_UART_Transmit(&huart3, &newline, 1, 1000);
+    uint8_t newline[1] = "\n";
+    HAL_UART_Transmit(&huart3, newline, sizeof(newline), 1000);
 
     // CARRIAGE RETURN: 1 ASCII character
-    uint8_t carriage = 0xD;
-    HAL_UART_Transmit(&huart3, &carriage, 1, 1000);
+    uint8_t carriage[1] = "\r";
+    HAL_UART_Transmit(&huart3, carriage, sizeof(carriage), 1000);
   }
 }
 
 __NO_RETURN void changeRadioSettingsTask(void *argument) {
-  // enter command mode
 
   while(1) {
+    // enter command mode
     uint8_t tripleplus[3] = {'+', '+', '+'};
 
     osDelay(1000);
     HAL_UART_Transmit(&huart3, tripleplus, sizeof(tripleplus), 1000);
     osDelay(2000);
-    
-    // wait for confirmation (OK\r)
-    
-    // uint8_t check_dh[5] = "ATDH\r";
-    // HAL_UART_Transmit(&huart3, check_dh, sizeof(check_dh), 1000);
     
     uint8_t check_dl[5] = "ATDL\r";
     HAL_UART_Transmit(&huart3, check_dl, sizeof(check_dl), 1000);
@@ -298,14 +292,15 @@ __NO_RETURN void changeRadioSettingsTask(void *argument) {
     // send ATDL
     HAL_UART_Transmit(&huart3, check_dl, sizeof(check_dl), 1000);
     
-    // send "ATAC" and "ATWR"
     osDelay(1000);
     
+    // send "ATAC" (apply changes)
     uint8_t apply_changes[5] = "ATAC\r";
     HAL_UART_Transmit(&huart3, apply_changes, sizeof(apply_changes), 1000);
 
     osDelay(1000);
 
+    // send "ATWR" (write changes to non-volatile memory)
     uint8_t write_changes[5] = "ATWR\r";
     HAL_UART_Transmit(&huart3, write_changes, sizeof(write_changes), 1000);
 
@@ -315,12 +310,6 @@ __NO_RETURN void changeRadioSettingsTask(void *argument) {
 
     osThreadExit();
   }
-
-
- 
-  // send AC (apply changes) and WR (write) commands 
-  
-  // osThreadExit();
 }
 
 void sendChar(char c)
