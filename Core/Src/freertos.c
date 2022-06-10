@@ -19,6 +19,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
+// #include "stm32f1xx_hal_gpio.h"
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
@@ -71,6 +72,12 @@ const osThreadAttr_t kernelLEDTask_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
 };
 
+const osThreadAttr_t changeRadioSettingsTask_attributes = {
+  .name = "changeRadioSettings",
+  .stack_size = 128 * 8,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+
 const osMessageQueueAttr_t canMessageQueue_attributes = {
   .name = "canMessageQueue"
 };
@@ -78,6 +85,7 @@ const osMessageQueueAttr_t canMessageQueue_attributes = {
 osThreadId_t readCANTaskHandle;
 osThreadId_t kernelLEDTaskHandle;
 osThreadId_t transmitMessageTaskHandle;
+osThreadId_t changeRadioSettingsTaskHandle;
 
 osMessageQueueId_t canMessageQueueHandle;
 
@@ -96,6 +104,7 @@ const osThreadAttr_t defaultTask_attributes = {
 void kernelLEDTask (void *argument);
 void readCANTask(void *argument);
 void transmitMessageTask(void *argument);
+void changeRadioSettingsTask(void *argument);
 
 void sendByte(char c);
 void sendChar(char c);
@@ -136,13 +145,16 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  // defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
 
   // kernelLEDTaskHandle = osThreadNew(kernelLEDTask, NULL, &kernelLEDTask_attributes);
+  
   readCANTaskHandle = osThreadNew(readCANTask, NULL, &readCANTask_attributes);
   transmitMessageTaskHandle = osThreadNew(transmitMessageTask, NULL, &transmitMessageTask_attributes);
+
+  // changeRadioSettingsTaskHandle = osThreadNew(changeRadioSettingsTask, NULL, &changeRadioSettingsTask_attributes);
 
   /* USER CODE END RTOS_THREADS */
 
@@ -255,6 +267,60 @@ __NO_RETURN void transmitMessageTask(void *argument) {
     uint8_t carriage = 0xD;
     HAL_UART_Transmit(&huart3, &carriage, 1, 1000);
   }
+}
+
+__NO_RETURN void changeRadioSettingsTask(void *argument) {
+  // enter command mode
+
+  while(1) {
+    uint8_t tripleplus[3] = {'+', '+', '+'};
+
+    osDelay(1000);
+    HAL_UART_Transmit(&huart3, tripleplus, sizeof(tripleplus), 1000);
+    osDelay(2000);
+    
+    // wait for confirmation (OK\r)
+    
+    // uint8_t check_dh[5] = "ATDH\r";
+    // HAL_UART_Transmit(&huart3, check_dh, sizeof(check_dh), 1000);
+    
+    uint8_t check_dl[5] = "ATDL\r";
+    HAL_UART_Transmit(&huart3, check_dl, sizeof(check_dl), 1000);
+    
+    osDelay(1000);
+
+    // send destination low change AT command
+    uint8_t change_dl[15] = "ATDL 418C9CBD\r";
+    HAL_UART_Transmit(&huart3, change_dl, sizeof(change_dl), 1000);
+
+    osDelay(1000);
+
+    // send ATDL
+    HAL_UART_Transmit(&huart3, check_dl, sizeof(check_dl), 1000);
+    
+    // send "ATAC" and "ATWR"
+    osDelay(1000);
+    
+    uint8_t apply_changes[5] = "ATAC\r";
+    HAL_UART_Transmit(&huart3, apply_changes, sizeof(apply_changes), 1000);
+
+    osDelay(1000);
+
+    uint8_t write_changes[5] = "ATWR\r";
+    HAL_UART_Transmit(&huart3, write_changes, sizeof(write_changes), 1000);
+
+    osDelay(1000);
+
+    HAL_GPIO_WritePin(KERNEL_LED_GPIO_Port, KERNEL_LED_Pin, GPIO_PIN_SET);
+
+    osThreadExit();
+  }
+
+
+ 
+  // send AC (apply changes) and WR (write) commands 
+  
+  // osThreadExit();
 }
 
 void sendChar(char c)
