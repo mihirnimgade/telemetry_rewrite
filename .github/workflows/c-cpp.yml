@@ -2,7 +2,7 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "ci" ]
   pull_request:
     branches: [ "main" ]
 
@@ -17,3 +17,12 @@ jobs:
       run: sudo apt-get update && sudo apt-get install gcc-arm-none-eabi
     - name: make debug
       run: cd Debug/ && make -j8 all
+      
+    - name: collect artifacts
+      run: mkdir build && cp Debug/*.elf build
+      
+    - name: upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: debug build
+        path: build
