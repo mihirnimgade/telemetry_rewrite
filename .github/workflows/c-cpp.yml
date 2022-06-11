@@ -22,8 +22,6 @@ jobs:
       if: ${{ contains(github.ref, 'refs/tags/') }}
       run: |
         echo "::set-env name=BRANCH_NAME::${GITHUB_REF##*/}"
-        echo "::set-env name=COMMIT_ID::${git rev-parse --short "$GITHUB_SHA"}"
-      
       
     - name: Collect build artifacts
       run: mkdir build && cp Debug/*.* build
