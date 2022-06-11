@@ -57,6 +57,7 @@ dkms.conf
 .metadata*
 .vscode*
 RemoteSystemsTempFiles*
+.settings/*
 
 # Compiled binaries
 Doxyfile-firmwarev3
