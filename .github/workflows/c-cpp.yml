@@ -18,11 +18,18 @@ jobs:
     - name: Build debug target
       run: cd Debug/ && make -j8 all && arm-none-eabi-objcopy -O binary telemetry.elf telemetry.bin
       
+    - name: Get branch name and commit ID
+      if: ${{ contains(github.ref, 'refs/tags/') }}
+      run: |
+        echo "::set-env name=BRANCH_NAME::${GITHUB_REF##*/}"
+        echo "::set-env name=COMMIT_ID::${git rev-parse --short "$GITHUB_SHA"}"
+      
+      
     - name: Collect build artifacts
       run: mkdir build && cp Debug/*.* build
       
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: build
+        name: ${{ env.BRANCH_NAME }}-${{ env.COMMIT_ID }}-build
         path: build
