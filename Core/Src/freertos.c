@@ -203,6 +203,9 @@ __NO_RETURN void readCANTask(void *argument) {
   static CAN_msg_t current_can_message;
 
   while (1) {
+    // wait for thread flags to be set
+    osThreadFlagsWait(CAN_READY, osFlagsWaitAll, osWaitForever);
+
     if (HAL_CAN_GetRxFifoFillLevel(&hcan, CAN_RX_FIFO0) != 0) {
       // there are multiple CAN IDs being passed through the filter, pull out the current message
       rx_status = HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0, &can_rx_header, current_can_data);
@@ -217,7 +220,9 @@ __NO_RETURN void readCANTask(void *argument) {
       // priority=0, timeout=0
       osMessageQueuePut(canMessageQueueHandle, &current_can_message, 0U, 0U);
     }
-    osDelay(100);
+
+    HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
+
   }
 }
 

@@ -110,11 +110,8 @@ int main(void)
   can_start = HAL_CAN_Start(&hcan);
   assert_param(can_start == HAL_OK);
 
-  // HAL_StatusTypeDef can_notification_status = HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
-  // assert_param(can_notification_status == HAL_OK);
-
-  // XBee Setup
-  // XBeeInit();
+  HAL_StatusTypeDef can_notification_status = HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
+  assert_param(can_notification_status == HAL_OK);
 
   /* USER CODE END 2 */
 
