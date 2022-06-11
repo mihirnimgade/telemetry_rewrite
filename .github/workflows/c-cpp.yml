@@ -2,7 +2,7 @@ name: Embedded Make CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "ci" ]
   pull_request:
     branches: [ "main" ]
 
@@ -16,7 +16,7 @@ jobs:
     - name: Install toolchain (arm-none-eabi)
       run: sudo apt-get update && sudo apt-get install gcc-arm-none-eabi
     - name: Build debug target
-      run: cd Debug/ && make -j8 all
+      run: cd Debug/ && make -j8 all && arm-none-eabi-objcopy -O binary telemetry.elf telemetry.bin
       
     - name: Collect build artifacts
       run: mkdir build && cp Debug/*.* build
